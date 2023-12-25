@@ -44,7 +44,20 @@ class TodoListViewController: UITableViewController {
    //MARK - TableView Delegate Methods
     //First, the one that gets fired upon any click in a cell
     
-      
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//      functionality for selecting a row
+        
+        if         tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark{
+            tableView.cellForRow(at: indexPath)?.accessoryType = .none
+
+        } else {
+            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+
+        }
+
+        //want to delect quickly so that the UI only flashed gray briefly
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
        
 
 }
