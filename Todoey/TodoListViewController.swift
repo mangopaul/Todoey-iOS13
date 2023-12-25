@@ -11,7 +11,7 @@ import UIKit
 class TodoListViewController: UITableViewController {
     //by subclassing to UITableViewController, we get a lot of free functionality, for example, no need to create IBOutlets.
     
-    let itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
+    var itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -59,6 +59,27 @@ class TodoListViewController: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
     }
        
+//MARK - Add New Items
+    
+    
+    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
+        var textField = UITextField() //initialized empty
 
+        //Want to add a popup, UI Alet to add a list item and append it.
+        let alert = UIAlertController(title: "Add New Todey Item", message: "", preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: "Add Item", style: .default) {(action) in
+            //what will happen once the user clicke the Add Item button on our UIAlert
+//            print(textField.text)
+            self.itemArray.append(textField.text!)
+            self.tableView.reloadData()
+        }
+        alert.addTextField { (alertTextField) in
+            alertTextField.placeholder = "Create new item"
+            textField = alertTextField
+        }
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
+    }
 }
 
