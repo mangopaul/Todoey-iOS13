@@ -12,10 +12,15 @@ class TodoListViewController: UITableViewController {
     //by subclassing to UITableViewController, we get a lot of free functionality, for example, no need to create IBOutlets.
     
     var itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
+    
+    let defaults = UserDefaults.standard
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        
+        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
+            itemArray = items
+        }
     }
 
 //MARK - Tableview Datasource Methods
@@ -72,6 +77,10 @@ class TodoListViewController: UITableViewController {
             //what will happen once the user clicke the Add Item button on our UIAlert
 //            print(textField.text)
             self.itemArray.append(textField.text!)
+            
+            self.defaults.set(self.itemArray, forKey: "TodoListArray")
+            //defaults are saved in a plist file
+            
             self.tableView.reloadData()
         }
         alert.addTextField { (alertTextField) in
