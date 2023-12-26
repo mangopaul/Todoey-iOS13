@@ -8,19 +8,35 @@
 
 import UIKit
 
+
+
 class TodoListViewController: UITableViewController {
     //by subclassing to UITableViewController, we get a lot of free functionality, for example, no need to create IBOutlets.
     
-    var itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
+//    var itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
+    var itemArray = [Item]()
     
     let defaults = UserDefaults.standard
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
+        
+        let newItem = Item()
+        newItem.title = "Find Mike"
+        itemArray.append(newItem)
+        
+        let newItem2 = Item()
+        newItem2.title = "Buy Eggos"
+        itemArray.append(newItem2)
+        
+        let newItem3 = Item()
+        newItem3.title = "Destroy Demogorgon"
+        itemArray.append(newItem3)
+    
+        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
             itemArray = items
         }
+        
     }
 
 //MARK - Tableview Datasource Methods
@@ -36,12 +52,17 @@ class TodoListViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         //ask the datasource for a cell to insert in a particular location of the table view
-        let item = itemArray[indexPath.row]
         //Note the lesson reference for code sense, the list of symbols for the autocompleting code to distinguish category of code to be inserted
         //In this case L or V for local or global variable for tableView are OK.
+        //Note that a Reusable Cell is used because when scrolling a cell out of view, it is deallocated and destroyed and new one created for the cell that comes into view. With dequeue, the actual cell is reused which means that the checked property is maintained.
         let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
         //dequeueReusableCell - Returns a reusable table-view cell object for the specified reuse identifier and adds it to the table.
-        cell.textLabel?.text = item
+        let item = itemArray[indexPath.row]
+        
+        cell.textLabel?.text = item.title
+        
+        cell.accessoryType = item.done ? .checkmark : .none
+
         
         return cell
         }
@@ -52,13 +73,10 @@ class TodoListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 //      functionality for selecting a row
         
-        if         tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark{
-            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-
-        } else {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-
-        }
+        itemArray[indexPath.row].done = !itemArray[indexPath.row].done //toggle the value done
+        
+        tableView.reloadData()
+        
 
         //want to delect quickly so that the UI only flashed gray briefly
         tableView.deselectRow(at: indexPath, animated: true)
@@ -75,11 +93,13 @@ class TodoListViewController: UITableViewController {
         
         let action = UIAlertAction(title: "Add Item", style: .default) {(action) in
             //what will happen once the user clicke the Add Item button on our UIAlert
-//            print(textField.text)
-            self.itemArray.append(textField.text!)
+            let newItem = Item()
+            newItem.title = textField.text!
+            self.itemArray.append(newItem)
             
             self.defaults.set(self.itemArray, forKey: "TodoListArray")
             //defaults are saved in a plist file
+            //after updating itemArray to be an array of objects,the line above will cause an app to crash. Need to abandon UserDefaults to store this data.
             
             self.tableView.reloadData()
         }
