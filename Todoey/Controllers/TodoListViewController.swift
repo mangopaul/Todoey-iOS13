@@ -62,8 +62,13 @@ class TodoListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 //      functionality for selecting a row
+        //sample code for deleting a row instead of toggling the check mark
+        //Note that the order matters in the code below. Need to delete the item in the context first
+//        context.delete(itemArray[indexPath.row])
+//        itemArray.remove(at: indexPath.row)
+      
         
-        itemArray[indexPath.row].done = !itemArray[indexPath.row].done //toggle the value done
+//        itemArray[indexPath.row].done = !itemArray[indexPath.row].done //toggle the value done
         
         saveItems()
         
