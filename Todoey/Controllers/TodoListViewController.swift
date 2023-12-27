@@ -15,12 +15,14 @@ class TodoListViewController: UITableViewController {
     
 //    var itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
     var itemArray = [Item]()
-    
-    let defaults = UserDefaults.standard
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        print(dataFilePath!)
+
         let newItem = Item()
         newItem.title = "Find Mike"
         itemArray.append(newItem)
@@ -33,9 +35,9 @@ class TodoListViewController: UITableViewController {
         newItem3.title = "Destroy Demogorgon"
         itemArray.append(newItem3)
     
-        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
-            itemArray = items
-        }
+//        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
+//            itemArray = items
+//        }
         
     }
 
@@ -75,7 +77,7 @@ class TodoListViewController: UITableViewController {
         
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done //toggle the value done
         
-        tableView.reloadData()
+        saveItems()
         
 
         //want to delect quickly so that the UI only flashed gray briefly
@@ -96,12 +98,9 @@ class TodoListViewController: UITableViewController {
             let newItem = Item()
             newItem.title = textField.text!
             self.itemArray.append(newItem)
+            self.saveItems()
             
-            self.defaults.set(self.itemArray, forKey: "TodoListArray")
-            //defaults are saved in a plist file
-            //after updating itemArray to be an array of objects,the line above will cause an app to crash. Need to abandon UserDefaults to store this data.
             
-            self.tableView.reloadData()
         }
         alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "Create new item"
@@ -109,6 +108,18 @@ class TodoListViewController: UITableViewController {
         }
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
+    }
+    
+    func saveItems() {
+        let encoder = PropertyListEncoder()
+        do {
+            let data = try encoder.encode(itemArray)
+            try data.write(to: dataFilePath!)
+        } catch {
+            print("Error encoding item array, \(error)")
+        }
+        
+        self.tableView.reloadData()
     }
 }
 
