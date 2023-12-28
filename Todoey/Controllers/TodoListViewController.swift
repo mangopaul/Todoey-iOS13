@@ -120,6 +120,8 @@ class TodoListViewController: UITableViewController {
         } catch {
             print("Error fetching data from context, \(error)")
         }
+        
+        tableView.reloadData()
     }
     
     
@@ -129,7 +131,7 @@ class TodoListViewController: UITableViewController {
 
 extension TodoListViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        let request: NSFetchRequest<Item> = Item.fetchRequest()
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
         
         request.predicate = NSPredicate(format: "title CONTAINS [cd] %@", searchBar.text!)
         //see the NSPredecate Cheat Sheet for Realm: https://academy.realm.io/posts/nspredicate-cheatsheet/
@@ -140,6 +142,16 @@ extension TodoListViewController: UISearchBarDelegate {
         loadItems(with: request)
 
         
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        print("Search text: \(searchText)")
+            loadItems()
+            if(searchText == ""){
+            DispatchQueue.main.async{
+                searchBar.resignFirstResponder()
+            }
+        }
     }
 }
 
