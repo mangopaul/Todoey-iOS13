@@ -22,14 +22,12 @@ class TodoListViewController: UITableViewController {
         super.viewDidLoad()
         print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
 
-        
-//        print(dataFilePath!)
 
         loadItems()
         
     }
 
-//MARK - Tableview Datasource Methods
+//MARK: - Tableview Datasource Methods
     //Note that the implementation in this app as compared to the FlashChat app is simpler because of the subclassing of ToDoListViewController to UITableViewController
     //as opposed to UIViewController. The IBOutlets are handled behind the scenes.
     
@@ -57,7 +55,7 @@ class TodoListViewController: UITableViewController {
         return cell
         }
         
-   //MARK - TableView Delegate Methods
+   //MARK: - TableView Delegate Methods
     //First, the one that gets fired upon any click in a cell
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -68,7 +66,7 @@ class TodoListViewController: UITableViewController {
 //        itemArray.remove(at: indexPath.row)
       
         
-//        itemArray[indexPath.row].done = !itemArray[indexPath.row].done //toggle the value done
+        itemArray[indexPath.row].done = !itemArray[indexPath.row].done //toggle the value done
         
         saveItems()
         
@@ -77,7 +75,7 @@ class TodoListViewController: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
     }
        
-//MARK - Add New Items
+//MARK: - Add New Items
     
     
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
@@ -114,13 +112,34 @@ class TodoListViewController: UITableViewController {
         
         self.tableView.reloadData()
     }
-    func loadItems() {
-        let request : NSFetchRequest<Item> = Item.fetchRequest()
+    
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest() ) {
+//        In the function declaration above, the "= Item.fetchRequest()" is a default value for request if none is provided
         do {
             itemArray = try context.fetch(request)
         } catch {
-            print("Error fetching context, \(error)")
+            print("Error fetching data from context, \(error)")
         }
+    }
+    
+    
+    
+}
+//MARK: - Search bar methods
+
+extension TodoListViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        let request: NSFetchRequest<Item> = Item.fetchRequest()
+        
+        request.predicate = NSPredicate(format: "title CONTAINS [cd] %@", searchBar.text!)
+        //see the NSPredecate Cheat Sheet for Realm: https://academy.realm.io/posts/nspredicate-cheatsheet/
+        //string comparisons are be default case and diacritic sensitive unless you include [cd] for case and diacritic insensitive
+        
+        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+        
+        loadItems(with: request)
+
+        
     }
 }
 
