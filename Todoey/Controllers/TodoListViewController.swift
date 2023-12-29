@@ -13,7 +13,6 @@ import CoreData
 class TodoListViewController: UITableViewController {
     //by subclassing to UITableViewController, we get a lot of free functionality, for example, no need to create IBOutlets.
     
-//    var itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
     var itemArray = [Item]()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
