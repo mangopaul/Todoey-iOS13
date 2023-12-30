@@ -12,8 +12,7 @@ import RealmSwift
 class CategoryViewControllerTableViewController: UITableViewController {
    
     let realm = try! Realm() //creates a new Realm, normally try! is bad practice
-    var categories = [Category]()
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    var categories: Results<Category>? //A type from Realm, a container for
   
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,20 +25,20 @@ class CategoryViewControllerTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     //tells the datasource to return the number of rows in a section of the table view
-        return categories.count
+        return categories?.count ?? 1 //if categories is nil, return 1, the '??' is a nil coalescing operator
     }
 
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         //ask the datasource for a cell to insert in a particular location of the table view
-        //Note the lesson reference for code sense, the list of symbols for the autocompleting code to distinguish category of code to be inserted
-        //In this case L or V for local or global variable for tableView are OK.
-        //Note that a Reusable Cell is used because when scrolling a cell out of view, it is deallocated and destroyed and new one created for the cell that comes into view. With dequeue, the actual cell is reused which means that the checked property is maintained.
+        //Note that a Reusable Cell is used because when scrolling a cell out of view,
+        //it is deallocated and destroyed and new one created for the cell that comes into view.
+        //With dequeue, the actual cell is reused which means that the checked property is maintained.
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
         //dequeueReusableCell - Returns a reusable table-view cell object for the specified reuse identifier and adds it to the table.
-        let category = categories[indexPath.row]
+        cell.textLabel?.text = categories?[indexPath.row].name ?? "No Category Added Yet"
         
-        cell.textLabel?.text = category.name
+      
         
         return cell
         }
@@ -54,7 +53,7 @@ class CategoryViewControllerTableViewController: UITableViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let destinationVC = segue.destination as! TodoListViewController
         if let indexPath = tableView.indexPathForSelectedRow{
-            destinationVC.selectedCategory = categories[indexPath.row]
+            destinationVC.selectedCategory = categories?[indexPath.row]
         }
 
     }
@@ -74,14 +73,9 @@ class CategoryViewControllerTableViewController: UITableViewController {
     }
     
     func loadCategories( ) {
-//        In the function declaration above, the "= Item.fetchRequest()" is a default value for request if none is provided
-//        do {
-//            categories = try context.fetch(request)
-//        } catch {
-//            print("Error fetching data from context, \(error)")
-//        }
-//        
-//        tableView.reloadData()
+        categories = realm.objects(Category.self)
+        
+        tableView.reloadData()
     }
     
     //MARK: - Add New Categories
@@ -97,7 +91,6 @@ class CategoryViewControllerTableViewController: UITableViewController {
             //what will happen once the user clicke the Add Item button on our UIAlert
             let newCategory = Category()
             newCategory.name = textField.text!
-            self.categories.append(newCategory)
             self.save(category: newCategory)
             
             

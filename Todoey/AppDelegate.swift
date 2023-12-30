@@ -22,12 +22,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("Realm path: \(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
         
         
-        do {
-            let realm = try Realm()
-        } catch {
-            print("Error initialising new realm, \(error)")
-        }
-        return true
+        //        do {
+        //            let realm = try Realm()
+        //        } catch {
+        //            print("Error initialising new realm, \(error)")
+        //        }
+                return true
+        
     }
 
 
