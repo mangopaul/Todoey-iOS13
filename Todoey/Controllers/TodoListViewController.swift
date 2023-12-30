@@ -63,17 +63,18 @@ class TodoListViewController: UITableViewController {
     //MARK: - TableView Delegate Methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //      functionality for selecting a row
-        //sample code for deleting a row instead of toggling the check mark
-        //Note that the order matters in the code below. Need to delete the item in the context first
-        //        context.delete(itemArray[indexPath.row])
-        //        itemArray.remove(at: indexPath.row)
-        
-        
-        //        todoItems[indexPath.row].done = !todoItems[indexPath.row].done //toggle the value done
-        //
-        //        saveItems()
-        
+        //      functionality for action after selecting a row
+
+        if let item = todoItems?[indexPath.row] {
+            do {
+                try realm.write {
+                    item.done = !item.done
+                }
+            } catch {
+                print("Error saving done status, \(error)")
+            }
+        }
+        tableView.reloadData()
         
         //want to delect quickly so that the UI only flashed gray briefly
         tableView.deselectRow(at: indexPath, animated: true)
