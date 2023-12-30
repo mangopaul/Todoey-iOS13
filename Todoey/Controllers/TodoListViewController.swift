@@ -14,15 +14,18 @@ class TodoListViewController: UITableViewController {
     //by subclassing to UITableViewController, we get a lot of free functionality, for example, no need to create IBOutlets.
     
     var itemArray = [Item]()
+    
+    var selectedCategory : Category? {
+        didSet{ //do the steps in the block below when this variable is set
+                loadItems()
+        }
+    }
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
     
     override func viewDidLoad() {
         super.viewDidLoad()
         print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
-
-
-        loadItems()
         
     }
 
@@ -55,7 +58,6 @@ class TodoListViewController: UITableViewController {
         }
         
    //MARK: - TableView Delegate Methods
-    //First, the one that gets fired upon any click in a cell
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 //      functionality for selecting a row
@@ -88,6 +90,7 @@ class TodoListViewController: UITableViewController {
             let newItem = Item(context: self.context)
             newItem.title = textField.text!
             newItem.done = false
+            newItem.parentCategory = self.selectedCategory
             self.itemArray.append(newItem)
             self.saveItems()
             
@@ -102,7 +105,6 @@ class TodoListViewController: UITableViewController {
     }
     
     func saveItems() {
-        let encoder = PropertyListEncoder()
         do {
             try context.save()
         } catch {
@@ -112,8 +114,17 @@ class TodoListViewController: UITableViewController {
         self.tableView.reloadData()
     }
     
-    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest() ) {
-//        In the function declaration above, the "= Item.fetchRequest()" is a default value for request if none is provided
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil) {
+    // In the function declaration above, the "= Item.fetchRequest()" is a default value for request if none is provided
+    // With the categories now in the data model, need to query for the items belonging to the selected category
+        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+        if let additionalPredicate = predicate {
+            //if a predicate was passed as an argument...
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionalPredicate])
+        } else {
+            request.predicate = categoryPredicate
+        }
+
         do {
             itemArray = try context.fetch(request)
         } catch {
@@ -132,24 +143,32 @@ extension TodoListViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         let request : NSFetchRequest<Item> = Item.fetchRequest()
         
-        request.predicate = NSPredicate(format: "title CONTAINS [cd] %@", searchBar.text!)
+        let  predicate = NSPredicate(format: "title CONTAINS [cd] %@", searchBar.text!)
         //see the NSPredecate Cheat Sheet for Realm: https://academy.realm.io/posts/nspredicate-cheatsheet/
         //string comparisons are be default case and diacritic sensitive unless you include [cd] for case and diacritic insensitive
         
         request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
         
-        loadItems(with: request)
+        loadItems(with: request, predicate: predicate)
 
         
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         print("Search text: \(searchText)")
+            
+        
+//        The next code changes the focus from the searchBar back to the items list if the searchBar text field is blank,
+        if(searchBar.text?.count == 0) {
             loadItems()
-            if(searchText == ""){
             DispatchQueue.main.async{
                 searchBar.resignFirstResponder()
             }
+        } else {
+            let request : NSFetchRequest<Item> = Item.fetchRequest()
+            let  predicate = NSPredicate(format: "title CONTAINS [cd] %@", searchBar.text!)
+            request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+            loadItems(with: request, predicate: predicate)
         }
     }
 }

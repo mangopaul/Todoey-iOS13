@@ -15,7 +15,7 @@ class CategoryViewControllerTableViewController: UITableViewController {
   
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+//        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         loadCategories()
 
     }
@@ -41,11 +41,25 @@ class CategoryViewControllerTableViewController: UITableViewController {
         
         return cell
         }
+    
+    //MARK: - TableView Delegate Methods
+
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//      functionality for selecting selecting a category, perform segue to ToListViewController
+        performSegue(withIdentifier: "goToItems", sender: self)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let destinationVC = segue.destination as! TodoListViewController
+        if let indexPath = tableView.indexPathForSelectedRow{
+            destinationVC.selectedCategory = categories[indexPath.row]
+        }
+
+    }
     //MARK: - Data Manipulation Methods
     
     
     func saveCategories() {
-        let encoder = PropertyListEncoder()
         do {
             try context.save()
         } catch {
@@ -94,7 +108,6 @@ class CategoryViewControllerTableViewController: UITableViewController {
     
 
     
-    //MARK: - TableView Delegate Methods
     
     
 
