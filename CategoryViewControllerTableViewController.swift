@@ -12,6 +12,7 @@ import RealmSwift
 class CategoryViewControllerTableViewController: UITableViewController {
    
     let realm = try! Realm() //creates a new Realm, normally try! is bad practice
+ 
     var categories: Results<Category>? //A type from Realm, a container for
   
     override func viewDidLoad() {

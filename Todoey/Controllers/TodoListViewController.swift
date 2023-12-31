@@ -98,6 +98,7 @@ class TodoListViewController: UITableViewController {
                     try self.realm.write{
                         let newItem = Item()
                         newItem.title = textField.text!
+                        newItem.dateCreated = Date()
                         currentCategory.items.append(newItem)                }
                 } catch {
                     print("Error saving newItem, \(error)")
@@ -125,37 +126,28 @@ class TodoListViewController: UITableViewController {
 }
 //MARK: - Search bar methods
 
-//extension TodoListViewController: UISearchBarDelegate {
-//    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-//        let request : NSFetchRequest<Item> = Item.fetchRequest()
-//
-//        let  predicate = NSPredicate(format: "title CONTAINS [cd] %@", searchBar.text!)
-//        //see the NSPredecate Cheat Sheet for Realm: https://academy.realm.io/posts/nspredicate-cheatsheet/
-//        //string comparisons are be default case and diacritic sensitive unless you include [cd] for case and diacritic insensitive
-//
-//        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-//
-//        loadItems(with: request, predicate: predicate)
-//
-//
-//    }
-//
-//    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-//        print("Search text: \(searchText)")
-//
-//
-////        The next code changes the focus from the searchBar back to the items list if the searchBar text field is blank,
-//        if(searchBar.text?.count == 0) {
-//            loadItems()
-//            DispatchQueue.main.async{
-//                searchBar.resignFirstResponder()
-//            }
-//        } else {
-//            let request : NSFetchRequest<Item> = Item.fetchRequest()
-//            let  predicate = NSPredicate(format: "title CONTAINS [cd] %@", searchBar.text!)
-//            request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-//            loadItems(with: request, predicate: predicate)
-//        }
-//    }
-//}
+extension TodoListViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        print("Searching with characters: \(searchBar.text!)")
+//        todoItems = todoItems?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "title", ascending: true)
+        todoItems = todoItems?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: true)
+
+        //no need to call loadItems() but need to call tableView.reloadData()
+        tableView.reloadData()
+
+    }
+
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        print("Search text: \(searchText)")
+
+
+//        The next code changes the focus from the searchBar back to the items list if the searchBar text field is blank,
+        if(searchBar.text?.count == 0) {
+            loadItems()
+            DispatchQueue.main.async{
+                searchBar.resignFirstResponder()
+            }
+        }
+    }
+}
 
