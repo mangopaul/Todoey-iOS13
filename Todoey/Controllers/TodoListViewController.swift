@@ -54,9 +54,6 @@ class TodoListViewController: UITableViewController {
             cell.textLabel?.text = "No Items Added"
         }
         
-        
-        
-        
         return cell
     }
     
@@ -99,7 +96,8 @@ class TodoListViewController: UITableViewController {
                         let newItem = Item()
                         newItem.title = textField.text!
                         newItem.dateCreated = Date()
-                        currentCategory.items.append(newItem)                }
+                        currentCategory.items.append(newItem)
+                    }
                 } catch {
                     print("Error saving newItem, \(error)")
                 }
@@ -139,7 +137,6 @@ extension TodoListViewController: UISearchBarDelegate {
 
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         print("Search text: \(searchText)")
-
 
 //        The next code changes the focus from the searchBar back to the items list if the searchBar text field is blank,
         if(searchBar.text?.count == 0) {

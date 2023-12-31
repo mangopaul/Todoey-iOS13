@@ -17,7 +17,6 @@ class CategoryViewControllerTableViewController: UITableViewController {
   
     override func viewDidLoad() {
         super.viewDidLoad()
-//        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         loadCategories()
 
     }
@@ -38,9 +37,7 @@ class CategoryViewControllerTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
         //dequeueReusableCell - Returns a reusable table-view cell object for the specified reuse identifier and adds it to the table.
         cell.textLabel?.text = categories?[indexPath.row].name ?? "No Category Added Yet"
-        
-      
-        
+       
         return cell
         }
     
@@ -54,7 +51,7 @@ class CategoryViewControllerTableViewController: UITableViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let destinationVC = segue.destination as! TodoListViewController
         if let indexPath = tableView.indexPathForSelectedRow{
-            destinationVC.selectedCategory = categories?[indexPath.row]
+            destinationVC.selectedCategory = categories?[indexPath.row] //This passed the selecting category to the next view controller
         }
 
     }
@@ -67,7 +64,7 @@ class CategoryViewControllerTableViewController: UITableViewController {
                 realm.add(category)
             }
         } catch {
-            print("Error saving context, \(error)")
+            print("Error saving category, \(error)")
         }
         
         self.tableView.reloadData()
@@ -94,7 +91,6 @@ class CategoryViewControllerTableViewController: UITableViewController {
             newCategory.name = textField.text!
             self.save(category: newCategory)
             
-            
         }
         alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "Create new category"
@@ -103,11 +99,5 @@ class CategoryViewControllerTableViewController: UITableViewController {
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
     }
-    
-
-    
-    
-    
-
     
 }

@@ -20,15 +20,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         print("Realm path: \(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
-//        let realm = try! Realm()
-//        do {
-//            try realm.write { //to clear out the DB, comment this out to continue
-//                
-//                realm.deleteAll()
-//            }
-//        } catch {
-//            print("Error clearing the Realm database: \(error)")
-//        }
+        do {
+            _ = try Realm()
+        } catch {
+            print("Error initializing new realm: \(error)")
+        }
         return true
     }
 
